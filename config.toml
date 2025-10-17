@@ -1,0 +1,39 @@
+# UPS Monitor Configuration
+
+[ups]
+# UPS connection details
+host = "10.0.31.1"
+name = "ups1"
+port = 3493  # Default NUT port
+username = "admin"
+password = "Password123"
+
+[monitoring]
+# Polling interval in seconds
+poll_interval = 5
+
+[shutdown]
+# Enable automatic shutdown
+enabled = true
+
+# Shutdown conditions (any condition met will trigger shutdown)
+# Time in seconds after switching to battery
+on_battery_seconds = 300  # 5 minutes
+
+# Battery charge percentage threshold
+battery_percent_threshold = 20
+
+# Runtime threshold in seconds
+runtime_threshold = 180  # 3 minutes
+
+# Shutdown command (adjust for your system)
+shutdown_command = "/sbin/shutdown -h +0"
+
+# Grace period before executing shutdown (seconds)
+shutdown_grace_period = 30
+
+[logging]
+# Log file path
+log_file = "/var/log/rabbitnut.log"
+# Log level: trace, debug, info, warn, error
+log_level = "info"
