@@ -100,7 +100,7 @@ rabbitnut /etc/rabbitnut/config.toml
 
 Running RabbitNUT in the background is a simple task, just make sure that it runs without errors before doing this. Place the contents below in a file called `rabbitnut.service` in the `/etc/systemd/system/` directory.
 
-```toml
+```service
 [Unit]
 Description=RabbitNUT
 After=network.target
