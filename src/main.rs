@@ -11,6 +11,13 @@ use crate::logging::setup_logging;
 use crate::monitor::UpsMonitor;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+	let args: Vec<String> = env::args().collect();
+
+	if args.iter().any(|a| a == "--version" || a == "-v") {
+		println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+		return Ok(());
+	}
+
 	let config_path = env::args()
 		.nth(1)
 		.unwrap_or_else(|| "config.toml".to_string());

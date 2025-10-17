@@ -1,6 +1,6 @@
 [package]
 name = "rabbitnut"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 authors = ["Rabbit Company <info@rabbit-company.com>"]
 description = "UPS monitoring daemon with automatic shutdown capabilities"
