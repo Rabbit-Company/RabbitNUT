@@ -7,6 +7,7 @@ pub struct Config {
 	pub monitoring: MonitoringConfig,
 	pub shutdown: ShutdownConfig,
 	pub logging: LoggingConfig,
+	pub metrics: Option<MetricsConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -37,6 +38,14 @@ pub struct ShutdownConfig {
 pub struct LoggingConfig {
 	pub log_file: String,
 	pub log_level: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct MetricsConfig {
+	pub enabled: bool,
+	pub port: u16,
+	pub bearer_token: Option<String>,
+	pub format: Option<String>,
 }
 
 impl Config {
@@ -70,6 +79,12 @@ impl Default for Config {
 				log_file: "/var/log/rabbitnut.log".to_string(),
 				log_level: "info".to_string(),
 			},
+			metrics: Some(MetricsConfig {
+				enabled: false,
+				port: 8089,
+				bearer_token: None,
+				format: Some("openmetrics".to_string()),
+			}),
 		}
 	}
 }

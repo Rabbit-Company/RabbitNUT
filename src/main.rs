@@ -1,5 +1,6 @@
 mod config;
 mod logging;
+mod metrics;
 mod monitor;
 mod ups;
 
@@ -27,6 +28,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	setup_logging(&config.logging)?;
 
 	info!("UPS Monitor started with config: {}", config_path);
+
+	if let Some(ref metrics) = config.metrics {
+		if metrics.enabled {
+			info!(
+				"Metrics API enabled on port {} (format: {})",
+				metrics.port,
+				metrics
+					.format
+					.as_ref()
+					.unwrap_or(&"openmetrics".to_string())
+			);
+
+			if metrics.bearer_token.is_some() {
+				info!("Bearer token authentication enabled for metrics endpoint");
+			}
+		}
+	}
 
 	let mut monitor: UpsMonitor = UpsMonitor::new(config);
 	monitor.run();

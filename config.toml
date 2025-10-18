@@ -37,3 +37,17 @@ shutdown_grace_period = 30
 log_file = "/var/log/rabbitnut.log"
 # Log level: trace, debug, info, warn, error
 log_level = "info"
+
+[metrics]
+# Enable metrics API endpoint
+enabled = true
+
+# Port to listen on for metrics endpoint
+port = 8089
+
+# Optional bearer token for authentication
+# If not set, no authentication is required
+bearer_token = "secure-monitoring-token-123"
+
+# Metrics format: "openmetrics" or "json"
+format = "openmetrics"

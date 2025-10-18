@@ -8,6 +8,7 @@ pub struct UpsStatus {
 	pub battery_runtime: u64,
 	pub ups_status: String,
 	pub on_battery: bool,
+	pub output_power: Option<f64>,
 }
 
 impl fmt::Display for UpsStatus {
@@ -96,7 +97,6 @@ impl UpsClient {
 		let mut response = String::new();
 		reader.read_line(&mut response)?;
 
-		// Parse response: VAR ups1 battery.charge "100"
 		let parts: Vec<&str> = response.trim().split_whitespace().collect();
 		if parts.len() >= 4 && parts[0] == "VAR" {
 			let value = parts[3..].join(" ").trim_matches('"').to_string();
@@ -124,11 +124,17 @@ impl UpsClient {
 		let ups_status = self.get_var(&mut stream, "ups.status")?;
 		let on_battery = ups_status.contains("OB") || ups_status.contains("DISCHRG");
 
+		let output_power = match self.get_var(&mut stream, "output.power") {
+			Ok(v) => v.parse::<f64>().ok(),
+			Err(_) => None,
+		};
+
 		Ok(UpsStatus {
 			battery_charge,
 			battery_runtime,
 			ups_status,
 			on_battery,
+			output_power,
 		})
 	}
 

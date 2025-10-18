@@ -1,15 +1,20 @@
 use log::{debug, error, info, warn};
 use std::process::Command;
+use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
+use tokio::runtime::Runtime;
 
 use crate::config::Config;
+use crate::metrics::MetricsServer;
 use crate::ups::{UpsClient, UpsStatus};
 
 pub struct UpsMonitor {
 	config: Config,
 	client: UpsClient,
 	state: MonitorState,
+	metrics_server: Option<Arc<MetricsServer>>,
+	runtime: Option<Runtime>,
 }
 
 struct MonitorState {
@@ -27,6 +32,19 @@ impl UpsMonitor {
 			config.ups.password.clone(),
 		);
 
+		// Initialize metrics server if enabled
+		let (metrics_server, runtime) = if let Some(ref metrics_config) = config.metrics {
+			if metrics_config.enabled {
+				let runtime = Runtime::new().expect("Failed to create Tokio runtime");
+				let server = Arc::new(MetricsServer::new(metrics_config.clone()));
+				(Some(server), Some(runtime))
+			} else {
+				(None, None)
+			}
+		} else {
+			(None, None)
+		};
+
 		UpsMonitor {
 			config,
 			client,
@@ -34,6 +52,8 @@ impl UpsMonitor {
 				on_battery_since: None,
 				shutdown_scheduled: false,
 			},
+			metrics_server,
+			runtime,
 		}
 	}
 
@@ -42,6 +62,17 @@ impl UpsMonitor {
 			"Starting UPS monitor for {}@{}",
 			self.config.ups.name, self.config.ups.host
 		);
+
+		// Start metrics server if enabled
+		if let Some(ref server) = self.metrics_server {
+			if let Some(ref runtime) = self.runtime {
+				let server_clone = server.clone();
+				runtime.spawn(async move {
+					server_clone.start().await;
+				});
+				info!("Metrics server started");
+			}
+		}
 
 		self.print_ups_info();
 
@@ -79,6 +110,27 @@ impl UpsMonitor {
 		let status = self.client.get_status()?;
 
 		debug!("UPS Status: {}", status);
+
+		// Update metrics if server is enabled
+		if let Some(ref server) = self.metrics_server {
+			if let Some(ref runtime) = self.runtime {
+				let on_battery_duration = self
+					.state
+					.on_battery_since
+					.map(|since| since.elapsed().as_secs());
+
+				let server_clone = server.clone();
+				let ups_name = self.config.ups.name.clone();
+				let ups_host = self.config.ups.host.clone();
+				let status_clone = status.clone();
+
+				runtime.spawn(async move {
+					server_clone
+						.update_metrics(ups_name, ups_host, status_clone, on_battery_duration)
+						.await;
+				});
+			}
+		}
 
 		self.update_battery_state(&status);
 

@@ -1,16 +1,19 @@
-# RabbitNUT
+# 🐇 RabbitNUT
 
-This Rust program serves as a comprehensive UPS monitoring tool using the Network UPS Tools (NUT) protocol. It monitors UPS status, battery levels, and runtime, with configurable automatic shutdown capabilities for system protection.
+RabbitNUT is a Rust-based UPS monitoring tool that communicates with Network UPS Tools (NUT) servers.
 
-## Features
+It provides real-time UPS monitoring, safe system shutdown during power events, and optional metrics export for external monitoring systems.
 
-- **UPS Monitoring**: Real-time monitoring of UPS status, battery charge, and runtime
-- **Automatic Shutdown**: Configurable shutdown conditions to protect your system
-- **NUT Protocol Support**: Compatible with Network UPS Tools servers
-- **Flexible Configuration**: Easy setup via config.toml file
-- **Comprehensive Logging**: Detailed logging with configurable levels
+## 🚀 Features
 
-## Configuration
+- ⚡ **UPS Monitoring** — Continuously tracks UPS status, battery charge, and estimated runtime
+- 🔋 **Automatic Shutdown** — Graceful shutdown when configurable conditions are met
+- 🌐 **NUT Protocol Support** — Works with any Network UPS Tools (NUT)–compatible UPS
+- ⚙️ **Flexible Configuration** — Simple, TOML-based configuration file
+- 🧾 **Comprehensive Logging** — Adjustable log levels for detailed diagnostics
+- 📊 **Metrics Endpoint** — Optional metrics in JSON or OpenMetrics format for Prometheus and similar tools
+
+## ⚙️ Configuration
 
 Before running RabbitNUT, create a `config.toml` file with your UPS and monitoring settings:
 
@@ -54,36 +57,57 @@ shutdown_grace_period = 30
 log_file = "/var/log/rabbitnut.log"
 # Log level: trace, debug, info, warn, error
 log_level = "info"
+
+[metrics]
+# Enable metrics API endpoint
+enabled = true
+
+# Port to listen on for metrics endpoint
+port = 8089
+
+# Optional bearer token for authentication
+# If not set, no authentication is required
+bearer_token = "secure-monitoring-token-123"
+
+# Metrics format: "openmetrics" or "json"
+format = "openmetrics"
 ```
 
-## Configuration Sections
+## 📘 Configuration Sections
 
-### UPS Connection
+### 🔌 UPS Connection
 
-- **host**: IP address or hostname of your NUT server
-- **name**: Name of the UPS as configured in NUT
-- **port**: NUT server port (default: 3493)
-- **username**: Authentication username
-- **password**: Authentication password
+- `host`: IP or hostname of NUT server
+- `name`: UPS name as configured in NUT
+- `port`: NUT server port (default: 3493)
+- `username`: NUT Authentication username
+- `password`: NUT Authentication password
 
-### Monitoring
+### ⏱️ Monitoring
 
-- **poll_interval**: How frequently to check UPS status (in seconds)
+- `poll_interval`: How often to query UPS status (seconds)
 
-### Shutdown Conditions
+### ⚠️ Shutdown Behavior
 
-RabbitNUT will trigger a shutdown if ANY of these conditions are met:
+RabbitNUT triggers a shutdown when **any** of the following are true:
 
-- **on_battery_seconds**: UPS has been running on battery for specified time
-- **battery_percent_threshold**: Battery charge drops below specified percentage
-- **runtime_threshold**: Estimated runtime falls below threshold (in seconds)
+- UPS has been on battery longer than `on_battery_seconds`
+- Battery charge falls below `battery_percent_threshold`
+- Estimated runtime is under `runtime_threshold`
 
-### Logging
+### 🪵 Logging
 
-- **log_file**: Path where log files will be stored
-- **log_level**: Verbosity of logging (trace, debug, info, warn, error)
+- `log_file`: Path to log file
+- `log_level`: Verbosity of logging (trace, debug, info, warn, error)
 
-## Installation
+### 📈 Metrics
+
+- `enabled`: Enables or disables metrics endpoint
+- `port`: Port to listen for metrics requests
+- `bearer_token`: Optional token for API protection
+- `format`: Output format (openmetrics or json)
+
+## 🧩 Installation
 
 ```bash
 # Download the binary
@@ -96,7 +120,7 @@ sudo mv rabbitnut-$(uname -m)-gnu /usr/local/bin/rabbitnut
 rabbitnut /etc/rabbitnut/config.toml
 ```
 
-## Daemonizing (using systemd)
+## 🧠 Daemonizing (using systemd)
 
 Running RabbitNUT in the background is a simple task, just make sure that it runs without errors before doing this. Place the contents below in a file called `rabbitnut.service` in the `/etc/systemd/system/` directory.
 
@@ -123,7 +147,7 @@ Then, run the commands below to reload systemd and start RabbitNUT.
 systemctl enable --now rabbitnut
 ```
 
-## Upgrade
+## 🔄 Upgrade
 
 ```bash
 # Stop service
