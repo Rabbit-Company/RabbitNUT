@@ -162,15 +162,15 @@ async fn handle_metrics(
 fn format_openmetrics(metrics: &Metrics) -> String {
 	let mut output = String::new();
 
-	// Battery charge percentage
-	output.push_str("# TYPE ups_battery_charge_percent gauge\n");
-	output.push_str("# UNIT ups_battery_charge_percent percentage\n");
-	output.push_str("# HELP ups_battery_charge_percent Battery charge level as a percentage.\n");
+	// Battery charge ratio
+	output.push_str("# TYPE ups_battery_charge_ratio gauge\n");
+	output.push_str("# UNIT ups_battery_charge_ratio ratio\n");
+	output.push_str("# HELP ups_battery_charge_ratio Battery charge level as a ratio (0.0 to 1.0).\n");
 	output.push_str(&format!(
-		"ups_battery_charge_percent{{ups_name=\"{}\",ups_host=\"{}\"}} {}\n",
+		"ups_battery_charge_ratio{{ups_name=\"{}\",ups_host=\"{}\"}} {}\n",
 		escape_label(&metrics.ups_name),
 		escape_label(&metrics.ups_host),
-		metrics.battery_charge_percent
+		metrics.battery_charge_percent / 100.0
 	));
 
 	// Battery runtime
@@ -225,13 +225,13 @@ fn format_openmetrics(metrics: &Metrics) -> String {
 	}
 
 	// Last update timestamp
-	output.push_str("# TYPE ups_last_update_timestamp gauge\n");
-	output.push_str("# UNIT ups_last_update_timestamp seconds\n");
+	output.push_str("# TYPE ups_last_update_timestamp_seconds gauge\n");
+	output.push_str("# UNIT ups_last_update_timestamp_seconds seconds\n");
 	output.push_str(
-		"# HELP ups_last_update_timestamp Unix timestamp of last successful UPS status update.\n",
+		"# HELP ups_last_update_timestamp_seconds Unix timestamp of last successful UPS status update.\n",
 	);
 	output.push_str(&format!(
-		"ups_last_update_timestamp{{ups_name=\"{}\",ups_host=\"{}\"}} {}\n",
+		"ups_last_update_timestamp_seconds{{ups_name=\"{}\",ups_host=\"{}\"}} {}\n",
 		escape_label(&metrics.ups_name),
 		escape_label(&metrics.ups_host),
 		metrics.last_update
