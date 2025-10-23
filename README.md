@@ -150,14 +150,11 @@ systemctl enable --now rabbitnut
 ## 🔄 Upgrade
 
 ```bash
-# Stop service
-systemctl stop rabbitnut
-
-# Download Pulse Monitor
+# Download latest version of RabbitNut
 wget https://github.com/Rabbit-Company/RabbitNUT/releases/latest/download/rabbitnut-$(uname -m)-gnu
 sudo chmod 755 rabbitnut-$(uname -m)-gnu
 sudo mv rabbitnut-$(uname -m)-gnu /usr/local/bin/rabbitnut
 
-# Start service
-systemctl start rabbitnut
+# Restart service
+systemctl restart rabbitnut
 ```
