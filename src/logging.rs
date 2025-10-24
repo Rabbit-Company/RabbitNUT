@@ -1,23 +1,24 @@
 use chrono::Local;
 use log::LevelFilter;
 use std::fs::OpenOptions;
+use std::path::Path;
 
 use crate::config::LoggingConfig;
 
 pub fn setup_logging(config: &LoggingConfig) -> Result<(), Box<dyn std::error::Error>> {
 	let log_level = parse_log_level(&config.log_level);
 
-	let _ = OpenOptions::new()
-		.create(true)
-		.append(true)
-		.open(&config.log_file)?;
-
-	fern::Dispatch::new()
+	let mut dispatch = fern::Dispatch::new()
 		.level(log_level)
 		.level_for("rabbitnut", log_level)
-		.chain(create_stdout_logger(log_level))
-		.chain(create_file_logger(&config.log_file, log_level)?)
-		.apply()?;
+		.chain(create_stdout_logger(log_level));
+
+	if let Some(log_file) = &config.log_file {
+		ensure_log_file_exists(log_file)?;
+		dispatch = dispatch.chain(create_file_logger(log_file, log_level)?);
+	}
+
+	dispatch.apply()?;
 
 	Ok(())
 }
@@ -78,4 +79,17 @@ fn create_file_logger(
 			.level(level)
 			.chain(fern::log_file(path)?),
 	)
+}
+
+fn ensure_log_file_exists(path: &str) -> Result<(), Box<dyn std::error::Error>> {
+	// Create parent directories if they don't exist
+	if let Some(parent) = Path::new(path).parent() {
+		if !parent.exists() {
+			std::fs::create_dir_all(parent)?;
+		}
+	}
+
+	OpenOptions::new().create(true).append(true).open(path)?;
+
+	Ok(())
 }

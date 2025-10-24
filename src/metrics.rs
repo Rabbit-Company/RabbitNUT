@@ -165,7 +165,8 @@ fn format_openmetrics(metrics: &Metrics) -> String {
 	// Battery charge ratio
 	output.push_str("# TYPE ups_battery_charge_ratio gauge\n");
 	output.push_str("# UNIT ups_battery_charge_ratio ratio\n");
-	output.push_str("# HELP ups_battery_charge_ratio Battery charge level as a ratio (0.0 to 1.0).\n");
+	output
+		.push_str("# HELP ups_battery_charge_ratio Battery charge level as a ratio (0.0 to 1.0).\n");
 	output.push_str(&format!(
 		"ups_battery_charge_ratio{{ups_name=\"{}\",ups_host=\"{}\"}} {}\n",
 		escape_label(&metrics.ups_name),

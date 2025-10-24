@@ -36,7 +36,7 @@ pub struct ShutdownConfig {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct LoggingConfig {
-	pub log_file: String,
+	pub log_file: Option<String>,
 	pub log_level: String,
 }
 
@@ -76,7 +76,7 @@ impl Default for Config {
 				shutdown_grace_period: 30,
 			},
 			logging: LoggingConfig {
-				log_file: "/var/log/rabbitnut.log".to_string(),
+				log_file: None,
 				log_level: "info".to_string(),
 			},
 			metrics: Some(MetricsConfig {
